@@ -6,23 +6,24 @@ Created on Wed Apr 18 17:24:37 2018
 """
 
 # Initiate count of dupes, breaks, and invalid messages.
-dupeCount, dupeQty, breakCount, breakQty, invalidCount = (0 for i in range(5))
+dupeCount = dupeQty = breakCount = breakQty = invalidCount = 0
 
 # parentOrders (client-side): key is tag37=OrderID
 # childOrders (exchange-side): key is tag11=ClientOrderID
-# orderMap contains shild order to parent order mapping.
-parentOrders, childOrders, orderMap = ({} for i in range(3))
+# orderMap contains child order to parent order mapping.
+parentOrders = childOrders = orderMap = {}
 
 beginReport = True
 
 
 class ParentOrder(object):
     """Object representing a parent order.
-        orderID: Tag37=OrderID.
-        clientOrderID: Tag11=ClientOrderID.
-        inboundQtyDone: Increment from ChildOrder execution qtys.
-        fills: Set of execution ids.
-        childOrders: Set of ChildOrder objects."""
+        - orderID: Tag37=OrderID.
+        - clientOrderID: Tag11=ClientOrderID.
+        - inboundQtyDone: Increment from ChildOrder execution qtys.
+        - fills: Set of execution ids.
+        - childOrders: Set of ChildOrder objects.
+        """
     def __init__(self, orderID):
         self.orderID = orderID
         self.clientOrderID = ""
@@ -34,8 +35,9 @@ class ParentOrder(object):
 
 class ChildOrder(object):
     """Object representing a child order.
-        parentID: Value should be present in map file.
-        fills: Set of all tag17=ExecID."""
+        - parentID: Value should be present in map file.
+        - fills: Set of all tag17=ExecID.
+        """
     def __init__(self):
         self.parentID = None
         self.fills = set()
@@ -47,7 +49,8 @@ def parse(fixlog):
     towards the global invalid message count if there is no tag or value
     present. Messages are validated both by validateFIX() as well as exception
     handling in the event that a value is missing. Not sure if this is
-    according to protocol though..."""
+    according to protocol though...
+    """
     messages = []
     global invalidCount
     with open(fixlog, 'r') as fixlog:
@@ -69,7 +72,8 @@ def parse(fixlog):
     
 def validateFIX(message):
     """Performs minimum message validation.
-    (Code for more exhaustive validation based on conditional tags could go here)."""
+    (Code for more exhaustive validation based on conditional tags could go here).
+    """
     if "35" not in message.keys():
         return False
     messageType = message["35"]
@@ -96,7 +100,8 @@ def validateFIX(message):
 
 
 def mapChildtoParent(mapFile):
-    """Populates an order map dict with childID=parentID."""
+    """Populates an order map dict with childID=parentID.
+    """
     with open(mapFile, 'r') as file:
         next(file)  # ignore header
         for line in file:
@@ -110,7 +115,8 @@ def mapChildtoParent(mapFile):
 
 def getParentOrder(childID):
     """Retrieves the ParentOrder associated with a childID.
-    If successful, adds this object to parent orders dict."""
+    If successful, adds this object to parent orders dict.
+    """
     parentOrder = None
     if childID in orderMap.keys():
         parentOrderID = orderMap[childID]
@@ -130,7 +136,8 @@ def processOutbound(log):
     maps this to its ParentOrder obj.
     - Populates a parent order's child order set.
     - Populates a child orders execution set.
-    - Increments child order's parent qty done."""
+    - Increments child order's parent qty done.
+    """
     for message in log:
         if message["35"] == "8":
             parent = None
@@ -185,7 +192,8 @@ def processInbound(log):
           
           
 def writeCsv(outputcsv):
-    """Writes output.csv which indicates status and health of all orders."""
+    """Writes output.csv which indicates status and health of all orders.
+    """
     header = "clientid,parentid,is_healthy,num_child,inbound_exec_qty,outbound_exec_qty\n"
     with open(outputcsv, 'w+') as csv:
       csv.write(header)
@@ -200,7 +208,8 @@ def writeCsv(outputcsv):
 
           
 def reportBreak(breakType, execId, qty, childOrderId, parentOrdId, cliOrdId):
-    """Prints a message containing order break information to stdout."""
+    """Prints a message containing order break information to stdout.
+    """
     global beginReport
     if beginReport:
         print("ERROR,TYPE,EXEC_ID,QTY,PX,CHILD_ORDER,PARENT_ORDER,CLIENT_ORDER")
