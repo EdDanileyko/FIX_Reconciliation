@@ -217,14 +217,14 @@ def reportBreak(breakType, execId, qty, childOrderId, parentOrdId, cliOrdId):
     print("BREAK,{},{},{},{},{},{}".format(breakType, execId, qty, childOrderId, parentOrdId, cliOrdId))
     if breakType == "DUPLICATE":
         global dupeCount
-        dupeCount = dupeCount + 1
+        dupeCount += 1
         global dupeQty
-        dupeQty = dupeQty + qty
+        dupeQty += qty
     else:
         global breakCount
-        breakCount = breakCount + 1
+        breakCount += 1
         global breakQty
-        breakQty = breakQty + qty
+        breakQty += qty
 
 
 if __name__ == '__main__':
