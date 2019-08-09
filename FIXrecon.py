@@ -6,12 +6,18 @@ Created on Wed Apr 18 17:24:37 2018
 """
 
 # Initiate count of dupes, breaks, and invalid messages.
-dupeCount = dupeQty = breakCount = breakQty = invalidCount = 0
+dupeCount = 0
+dupeQty = 0
+breakCount = 0
+breakQty = 0
+invalidCount = 0
 
 # parentOrders (client-side): key is tag37=OrderID
 # childOrders (exchange-side): key is tag11=ClientOrderID
 # orderMap contains child order to parent order mapping.
-parentOrders = childOrders = orderMap = {}
+parentOrders = dict()
+childOrders = dict()
+orderMap = dict()
 
 beginReport = True
 
@@ -56,7 +62,7 @@ def parse(fixlog):
     with open(fixlog, 'r') as fixlog:
         for line in fixlog:
             try:
-                message = {field.split('=')[0]: field.split('=')[1] for field in line[:-2].split('')}
+                message = dict((pair.split('=', 1) for pair in line.split('')))
                 if validateFIX(message):
                     messages.append(message)
                 else:
